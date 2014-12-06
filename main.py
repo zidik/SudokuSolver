@@ -4,11 +4,10 @@ from sudoku_solver import SudokuSolver, NoSolutionFound
 
 
 def main():
-    #List of puzzles to solve
+    # List of puzzles to solve
     puzzle_files = ["puzzle.txt", "puzzle2.txt", "puzzle3.txt", "puzzle4.txt"]
     print("Loading puzzles.")
-    puzzles = []
-    puzzles.append(SudokuSolver.empty_puzzle())
+    puzzles = [SudokuSolver.empty_puzzle()]
     for path in puzzle_files:
         try:
             puzzle = SudokuSolver.fromfile(path)
@@ -31,6 +30,7 @@ def main():
         else:
             print("Solution found!")
             print(solver.solution)
+
 
 if __name__ == '__main__':
     main()

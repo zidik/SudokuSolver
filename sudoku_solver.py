@@ -1,6 +1,7 @@
 __author__ = 'Mark'
 from copy import deepcopy
 
+
 class SudokuSolver:
     def __init__(self, puzzle=None):
         self.puzzle = puzzle if (puzzle is not None) else SudokuPuzzle(SudokuPuzzle.empty())
@@ -16,7 +17,6 @@ class SudokuSolver:
         except SudokuException as e:
             print("caught SudokuException:", e)
             raise NoSolutionFound("This sudoku is invalid. ({})".format(path))
-
 
     @classmethod
     def empty_puzzle(cls):
@@ -37,7 +37,7 @@ class SudokuSolver:
             possible_values = puzzle.get_cell_value(*chosen_cell)
             for value in possible_values:
                 new_puzzle = deepcopy(puzzle)
-                assert (isinstance(new_puzzle, SudokuPuzzle)) #For Pycharm
+                assert (isinstance(new_puzzle, SudokuPuzzle))  # For Pycharm
                 new_puzzle.set_cell_value(*chosen_cell, value=value)
                 try:
                     new_puzzle.propagate_constraints()
@@ -47,9 +47,9 @@ class SudokuSolver:
                     try:
                         solution = SudokuSolver.solve_rec(new_puzzle)
                     except NoSolutionFound:
-                        pass # No solution found, continue search
+                        pass  # No solution found, continue search
                     else:
-                        break #We have found a solution -> break and return
+                        break  # We have found a solution -> break and return
             else:
                 raise NoSolutionFound("Could not find solution")
 
@@ -86,7 +86,7 @@ class SudokuPuzzle:
                 try:
                     length = len(element)
                 except TypeError:
-                    #Cell does not contain a list -> This cell is fully defined
+                    # Cell does not contain a list -> This cell is fully defined
                     pass
                 else:
                     if min_len is None or length < min_len:
@@ -96,14 +96,14 @@ class SudokuPuzzle:
             raise ValueError("No suitable cell found")
         return chosen_cell
 
-    def __init__(self, input_data=None, autopropagate=False):
+    def __init__(self, input_data=None, auto_propagate=False):
         if input_data is None:
             input_data = SudokuPuzzle.empty()
-        self._contents = [[list(range(1, 9+1)) for elem in row] for row in input_data]
+        self._contents = [[list(range(1, 9 + 1)) for _ in row] for row in input_data]
         for row_no, row in enumerate(input_data):
             for col_no, value in enumerate(row):
                 if value != '-':
-                    self.set_cell_value(col_no, row_no, int(value), autopropagate)
+                    self.set_cell_value(col_no, row_no, int(value), auto_propagate)
 
     def __str__(self):
         ret_string = ""
@@ -138,10 +138,11 @@ class SudokuPuzzle:
         try:
             len(self._contents[row][col])
         except TypeError:
-            #This does not contain a list => this cell already has a final value assigned.
+            # This does not contain a list => this cell already has a final value assigned.
             if self._contents[row][col] != value:
                 raise SudokuException("Tried to assign a new value to already defined cell.\n "
-                                 "row:{} col:{} current:{} new:{}".format(row, col, self._contents[row][col], value))
+                                      "row:{} col:{} current:{} new:{}".format(row, col, self._contents[row][col],
+                                                                               value))
             return
 
         if value in self._contents[row][col]:
@@ -155,8 +156,8 @@ class SudokuPuzzle:
                 except (AttributeError, ValueError):
                     pass
                 else:
-                    #Check if there are any options left after removal.
-                    if len(self.get_cell_value(u_col, u_row))==0:
+                    # Check if there are any options left after removal.
+                    if len(self.get_cell_value(u_col, u_row)) == 0:
                         raise SudokuException("Cell {},{} does not have any valid values left.".format(col, row))
                     if autopropagate:
                         u_value = self.get_cell_value(u_col, u_row)
@@ -187,17 +188,16 @@ class SudokuPuzzle:
         row_range = range(len(self._contents))
         col_unit = self.cross(col_range, row_range)
 
-        start_col = (col//3)*3
-        start_row = (row//3)*3
-        col_range = range(start_col, start_col+3)
-        row_range = range(start_row, start_row+3)
+        start_col = (col // 3) * 3
+        start_row = (row // 3) * 3
+        col_range = range(start_col, start_col + 3)
+        row_range = range(start_row, start_row + 3)
         box_unit = self.cross(col_range, row_range)
         return row_unit, col_unit, box_unit
 
     @staticmethod
     def cross(a, b):
         return [(e_a, e_b) for e_a in a for e_b in b]
-
 
 
 class SudokuException(ValueError):
